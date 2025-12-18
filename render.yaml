@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: desicode-backend
+    env: python
+    buildCommand: pip install -r aspy_backend/requirements.txt
+    startCommand: export PYTHONPATH=$PYTHONPATH:$(pwd)/aspy_backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.4
