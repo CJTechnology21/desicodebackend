@@ -158,12 +158,18 @@ def social_login(request: SocialLoginRequest, db: Session = Depends(get_db)):
         # Assign Free Subscription
         free_plan = db.query(Plan).filter(Plan.type == PlanType.FREE).first()
         if free_plan:
+            from datetime import timedelta
+            period_start = datetime.utcnow()
+            # For free plan, set end date far in the future (100 years)
+            period_end = period_start + timedelta(days=36500)
+            
             new_subscription = Subscription(
                 user_id=user.id,
                 plan_id=free_plan.id,
                 status=SubscriptionStatus.ACTIVE,
-                created_at=datetime.utcnow(),
-                current_period_start=datetime.utcnow()
+                created_at=period_start,
+                current_period_start=period_start,
+                current_period_end=period_end
             )
             db.add(new_subscription)
             db.commit()
@@ -216,13 +222,18 @@ def register_user(request: UserCreate, db: Session = Depends(get_db)):
     # Assign Free Subscription
     free_plan = db.query(Plan).filter(Plan.type == PlanType.FREE).first()
     if free_plan:
+        from datetime import timedelta
+        period_start = datetime.utcnow()
+        # For free plan, set end date far in the future (100 years)
+        period_end = period_start + timedelta(days=36500)
+        
         new_subscription = Subscription(
             user_id=new_user.id,
             plan_id=free_plan.id,
             status=SubscriptionStatus.ACTIVE,
-            created_at=datetime.utcnow(),
-            current_period_start=datetime.utcnow(),
-            # No end date for free plan or handle logic as needed
+            created_at=period_start,
+            current_period_start=period_start,
+            current_period_end=period_end
         )
         db.add(new_subscription)
         db.commit()
